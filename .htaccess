@@ -1,0 +1,35 @@
+# ディレクトリ一覧を非表示
+Options -Indexes
+
+# 管理パスワードを環境変数で定義（config.phpから参照）
+SetEnv KIDSHP_ADMIN_PASSWORD "your_password_here"
+
+# config.php・lib.phpへの直接アクセスを禁止
+<FilesMatch "^(config|lib)\.php$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# .env等の機密ファイルへのアクセスを禁止
+<FilesMatch "(^\.env|\.json$|\.log$|\.bak$|\.sql$)">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# HTTP→HTTPSリダイレクト
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{HTTPS} off
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+</IfModule>
